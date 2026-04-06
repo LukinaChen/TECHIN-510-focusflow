@@ -1,3 +1,111 @@
+# FocusFlow 🎯
+
+> A classroom focus timer that rewards students for staying on task.
+
+---
+
+## Overview
+
+FocusFlow is a web app designed to help students stay focused during class. Students start a timed focus session, and if they complete it without switching tabs or navigating away, they earn a small reward. Over time, these rewards reinforce better attention habits and make sustained focus feel achievable.
+
+This project was created for GIX coursework by **Veronika Sermeno Pon**.
+
+---
+
+## The Problem
+
+Students frequently get distracted by their phones or laptops during class — switching to social media, messaging apps, or unrelated tabs during lectures. This hurts both their own learning and the effectiveness of the class as a whole. FocusFlow gives students a simple, low-friction tool to self-regulate their attention.
+
+---
+
+## Key Features
+
+- **Timed focus sessions** — Choose a duration and start a countdown
+- **Stay-on-page detection** — The app detects if you tab away or switch windows
+- **Reward on completion** — Finish a session cleanly and earn points
+- **Session history** — Review past sessions and track your focus habits
+
+---
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js (App Router) |
+| Backend / DB | Supabase (Auth + Postgres) |
+| Styling | Tailwind CSS |
+| Deployment | Vercel |
+
+---
+
+## Pages
+
+1. **Home / Timer** — Set duration, start session, live countdown with focus detection
+2. **Reward Screen** — Celebrate a completed session and view earned points
+3. **Dashboard** — View session history and total rewards
+
+---
+
+## Getting Started
+
+```bash
+# Clone the repo
+git clone https://github.com/<your-username>/focusflow.git
+cd focusflow
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Fill in your Supabase URL and anon key
+
+# Run the dev server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+### Environment Variables
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+---
+
+## Project Timeline
+
+**Developer:** *(Developer's name)*  
+**Total Agreed Fee:** *(X)* GIX Bucks  
+**Development Period:** *(Start date)* → *(End date)*
+
+### Check-in Schedule
+
+| # | Date | Required Progress |
+|---|------|-------------------|
+| ✅ **Check-in 1** | *(Week 1 date)* | Initial architecture PR submitted: project scaffolded (Next.js + Supabase connected), Auth flow working, database schema created, repo structure established |
+| ✅ **Check-in 2** | *(Week 2 date)* | Core feature complete: Timer page functional with focus/tab-away detection, session saved to DB on completion, basic reward logic implemented |
+| ✅ **Check-in 3** | *(Week 3 date)* | Full MVP deployed: Reward screen and Dashboard view complete, deployed to Vercel, end-to-end flow working and tested |
+
+> **Note:** Product owner (Veronika) agrees to review all PRs within 48 hours of submission.
+
+---
+
+## Team
+
+| Role | Name |
+|------|------|
+| Product Owner | Veronika Sermeno Pon |
+| Developer | *Lukina Chen* |
+
+---
+
+## License
+
+MIT
+[README.md](https://github.com/user-attachments/files/26521933/README.md)
 # TECHIN 510 Final Project
 ---
 
