@@ -77,17 +77,17 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ## Project Timeline
 
-**Developer:** *(Developer's name)*  
-**Total Agreed Fee:** *(X)* GIX Bucks  
-**Development Period:** *(Start date)* → *(End date)*
+**Developer:** *Lukina*  
+**Total Agreed Fee:** *(40)* GIX Bucks  
+**Development Period:** *(4/8/2026)* → *(5/11/2026)*
 
 ### Check-in Schedule
 
-| # | Date | Required Progress |
-|---|------|-------------------|
-| ✅ **Check-in 1** | *(Week 1 date)* | Initial architecture PR submitted: project scaffolded (Next.js + Supabase connected), Auth flow working, database schema created, repo structure established |
-| ✅ **Check-in 2** | *(Week 2 date)* | Core feature complete: Timer page functional with focus/tab-away detection, session saved to DB on completion, basic reward logic implemented |
-| ✅ **Check-in 3** | *(Week 3 date)* | Full MVP deployed: Reward screen and Dashboard view complete, deployed to Vercel, end-to-end flow working and tested |
+| # | Date | Required Progress | Issues |
+|---|------|-------------------|--------|
+| ✅ **Check-in 1** | **Apr 20** | Architecture PR submitted. Project scaffolded: Next.js (App Router) initialized, Supabase connected via environment variables, `.env.example` documented, deployed to Vercel, folder structure established (`/app`, `/components`, `/lib`). Auth sign up/login working with Supabase Auth (email/password). Navigation bar and shared authenticated layout in place with responsive design. | #1, #2, #8 |
+| ✅ **Check-in 2** | **May 4** | Core features complete: Timer page with duration selector (25min/50min/custom) and MM:SS countdown display, including a growth animation that visually fills as the session progresses. Tab-away and window blur detection implemented with warning toast on first offense and session cancellation on second. Completed sessions saved to Supabase `sessions` table with RLS enabled and reward logic (+10 points per completed session). | #3, #4, #5 |
+| ✅ **Check-in 3** | **May 11** | Full MVP deployed: Reward/completion screen with confetti animation and randomized encouraging messages. Dashboard displays session history (date, duration, status) with total points and level system (🌱 Beginner → ⚔️ Focus Warrior → 🧘 Zen Master). End-to-end flow tested and working on Vercel. | #6, #7 |
 
 > **Note:** Product owner (Veronika) agrees to review all PRs within 48 hours of submission.
 
