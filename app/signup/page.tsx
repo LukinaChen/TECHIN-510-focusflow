@@ -10,6 +10,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [checkEmail, setCheckEmail] = useState(false)
   const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent) {
@@ -27,7 +28,7 @@ export default function SignupPage() {
 
     setLoading(true)
     const supabase = createClient()
-    const { error: authError } = await supabase.auth.signUp({ email, password })
+    const { data, error: authError } = await supabase.auth.signUp({ email, password })
 
     if (authError) {
       setError(authError.message)
@@ -35,8 +36,14 @@ export default function SignupPage() {
       return
     }
 
-    router.push('/timer')
-    router.refresh()
+    // If email confirmation is required, session will be null
+    if (data.session) {
+      router.push('/timer')
+      router.refresh()
+    } else {
+      setCheckEmail(true)
+      setLoading(false)
+    }
   }
 
   return (
@@ -48,6 +55,22 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+          {checkEmail ? (
+            <div className="text-center py-4">
+              <div className="text-4xl mb-4">📬</div>
+              <h2 className="text-xl font-semibold text-slate-900 mb-2">Check your email</h2>
+              <p className="text-slate-500 text-sm mb-6">
+                We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.
+              </p>
+              <Link
+                href="/login"
+                className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+              >
+                Go to Sign in
+              </Link>
+            </div>
+          ) : (
+          <>
           <h2 className="text-xl font-semibold text-slate-900 mb-6">Create your account</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -117,6 +140,8 @@ export default function SignupPage() {
               Sign in
             </Link>
           </p>
+          </>
+          )}
         </div>
       </div>
     </div>
