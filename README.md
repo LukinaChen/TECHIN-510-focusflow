@@ -2,7 +2,7 @@
 
 > A classroom focus timer that rewards students for staying on task.
 
-**Live URL:** _(to be added after Vercel deployment)_
+**Live URL:** https://techin-510-focusflow.vercel.app
 
 ---
 
