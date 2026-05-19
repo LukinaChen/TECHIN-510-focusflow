@@ -91,6 +91,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 | ✅ **Check-in 2** | **May 4** | Core features complete: Timer page with duration selector (25min/50min/custom) and MM:SS countdown display, including a growth animation that visually fills as the session progresses. Tab-away and window blur detection implemented with warning toast on first offense and session cancellation on second. Completed sessions saved to Supabase `sessions` table with RLS enabled and reward logic (+10 points per completed session). | #3, #4, #5 |
 | ✅ **Check-in 3** | **May 11** | Full MVP deployed: Reward/completion screen with confetti animation and randomized encouraging messages. Dashboard displays session history (date, duration, status) with total points and level system (🌱 Beginner → ⚔️ Focus Warrior → 🧘 Zen Master). End-to-end flow tested and working on Vercel. | #6, #7 |
 
+
 > **Note:** Product owner (Veronika) agrees to review all PRs within 48 hours of submission.
 
 ---
