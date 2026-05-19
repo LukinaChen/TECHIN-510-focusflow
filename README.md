@@ -66,7 +66,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the app.
+Open [http://localhost:3000](http://localhost:3000) to view the app locally, or visit the live deployment at **https://techin-510-focusflow.vercel.app**.
 
 ### Environment Variables
 
@@ -89,7 +89,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 |---|------|-------------------|--------|
 | ✅ **Check-in 1** | **Apr 20** | Architecture PR submitted. Project scaffolded: Next.js (App Router) initialized, Supabase connected via environment variables, `.env.example` documented, deployed to Vercel, folder structure established (`/app`, `/components`, `/lib`). Auth sign up/login working with Supabase Auth (email/password). Navigation bar and shared authenticated layout in place with responsive design. | #1, #2, #8 |
 | ✅ **Check-in 2** | **May 4** | Core features complete: Timer page with duration selector (25min/50min/custom) and MM:SS countdown display, including a growth animation that visually fills as the session progresses. Tab-away and window blur detection implemented with warning toast on first offense and session cancellation on second. Completed sessions saved to Supabase `sessions` table with RLS enabled and reward logic (+10 points per completed session). | #3, #4, #5 |
-| ⬜ **Check-in 3** | **May 11** | Full MVP deployed: Reward/completion screen with confetti animation and randomized encouraging messages. Dashboard displays session history (date, duration, status) with total points and level system (🌱 Beginner → ⚔️ Focus Warrior → 🧘 Zen Master). End-to-end flow tested and working on Vercel. | #6, #7 |
+| ✅ **Check-in 3** | **May 11** | Full MVP deployed: Reward/completion screen with confetti animation and randomized encouraging messages. Dashboard displays session history (date, duration, status) with total points and level system (🌱 Beginner → ⚔️ Focus Warrior → 🧘 Zen Master). End-to-end flow tested and working on Vercel. | #6, #7 |
 
 > **Note:** Product owner (Veronika) agrees to review all PRs within 48 hours of submission.
 
