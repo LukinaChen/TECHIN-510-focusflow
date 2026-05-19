@@ -2,6 +2,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+const ENCOURAGEMENTS = [
+  "Amazing focus! You're building a great habit. 🧠",
+  "You did it! Consistency is the key to mastery. 🔑",
+  "Look at you go! Every focused session counts. ⭐",
+  "Incredible! Your future self thanks you. 🙌",
+  "You crushed it! Distraction didn't stand a chance. 💪",
+  "Outstanding work! That's what dedication looks like. 🏆",
+]
+
 type TimerState = 'idle' | 'running' | 'completed' | 'broken' | 'cancelled'
 
 const PRESETS = [
@@ -23,6 +32,9 @@ export default function TimerPage() {
   const [focusLossCount, setFocusLossCount] = useState(0)
   const [showWarning, setShowWarning] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [encouragement] = useState(
+    () => ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)]
+  )
 
   // Refs for values needed in event handlers / async callbacks (avoid stale closures)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -305,8 +317,8 @@ export default function TimerPage() {
     completed: {
       icon: '🎉',
       title: 'Session Complete!',
-      message: `You stayed focused for ${selectedDuration} minutes.`,
-      sub: '+10 points earned',
+      message: encouragement,
+      sub: `+10 points · ${selectedDuration} min session`,
       cardClass: 'bg-emerald-50 border-emerald-200',
       titleClass: 'text-emerald-800',
       badgeClass: 'bg-emerald-100 text-emerald-700',

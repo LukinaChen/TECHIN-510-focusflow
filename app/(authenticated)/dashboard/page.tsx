@@ -10,6 +10,12 @@ type Session = {
   created_at: string
 }
 
+function getLevel(points: number): { label: string; icon: string; next: number | null } {
+  if (points >= 100) return { label: 'Zen Master', icon: '🧘', next: null }
+  if (points >= 50) return { label: 'Focus Warrior', icon: '⚔️', next: 100 }
+  return { label: 'Beginner', icon: '🌱', next: 50 }
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-US', {
     month: 'short',
@@ -36,10 +42,23 @@ export default async function DashboardPage() {
   const sessions = (data ?? []) as Session[]
   const totalPoints = sessions.reduce((sum, s) => sum + s.reward_earned, 0)
   const completedCount = sessions.filter((s) => s.completed).length
+  const level = getLevel(totalPoints)
 
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold text-slate-900 mb-6">Dashboard</h1>
+
+      {/* Level card */}
+      <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-6 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-1">Your Level</p>
+          <p className="text-2xl font-bold text-indigo-700">{level.icon} {level.label}</p>
+          {level.next !== null && (
+            <p className="text-xs text-indigo-400 mt-1">{level.next - totalPoints} points to next level</p>
+          )}
+        </div>
+        <div className="text-5xl">{level.icon}</div>
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">
