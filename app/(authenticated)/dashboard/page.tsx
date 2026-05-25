@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getLevel, formatDate } from '@/lib/utils'
 
 type Session = {
   id: string
@@ -8,21 +9,6 @@ type Session = {
   completed: boolean
   reward_earned: number
   created_at: string
-}
-
-function getLevel(points: number): { label: string; icon: string; next: number | null } {
-  if (points >= 100) return { label: 'Zen Master', icon: '🧘', next: null }
-  if (points >= 50) return { label: 'Focus Warrior', icon: '⚔️', next: 100 }
-  return { label: 'Beginner', icon: '🌱', next: 50 }
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }
 
 export default async function DashboardPage() {
