@@ -342,44 +342,41 @@ export default function TimerPage() {
 
   function exportSessionPdf() {
     const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    const status = timerState === 'completed' ? 'Completed' : timerState === 'broken' ? 'Broken (focus lost)' : 'Cancelled'
+    const status = timerState === 'completed' ? 'Completed' : timerState === 'broken' ? 'Broken' : 'Cancelled'
 
     const html = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8" />
-        <title>FocusFlow — ${topic || 'Session'} Notes</title>
+        <title>${topic || 'Session Notes'} — FocusFlow</title>
         <style>
-          body { font-family: system-ui, sans-serif; padding: 48px; color: #1e293b; max-width: 680px; margin: 0 auto; }
-          h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-          .meta { color: #64748b; font-size: 13px; margin-bottom: 32px; }
-          .meta span { margin-right: 16px; }
-          .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600;
-            background: ${timerState === 'completed' ? '#d1fae5' : '#fee2e2'};
-            color: ${timerState === 'completed' ? '#065f46' : '#991b1b'}; }
-          .notes-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-top: 24px; min-height: 200px; }
-          .notes-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 12px; }
-          .notes-text { font-size: 15px; line-height: 1.7; white-space: pre-wrap; color: #334155; }
-          .no-notes { color: #94a3b8; font-style: italic; }
-          @media print { body { padding: 24px; } }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: Georgia, serif; padding: 64px 72px; color: #1e293b; max-width: 720px; margin: 0 auto; }
+          h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+          .divider { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0 20px; }
+          .meta { font-family: system-ui, sans-serif; font-size: 13px; color: #64748b; display: flex; gap: 20px; align-items: center; margin-bottom: 36px; }
+          .status { font-weight: 600; color: ${timerState === 'completed' ? '#16a34a' : '#dc2626'}; }
+          .notes-heading { font-family: system-ui, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 14px; }
+          .notes-text { font-size: 15px; line-height: 1.85; white-space: pre-wrap; color: #334155; }
+          .no-notes { font-size: 14px; color: #94a3b8; font-style: italic; }
+          @media print { body { padding: 40px 48px; } }
         </style>
       </head>
       <body>
         <h1>${topic || 'Focus Session'}</h1>
+        <hr class="divider" />
         <div class="meta">
           <span>${date}</span>
           <span>${selectedDuration} min</span>
-          <span class="badge">${status}</span>
+          <span class="status">${status}</span>
           ${timerState === 'completed' ? `<span>+${earnedPoints} pts</span>` : ''}
         </div>
-        <div class="notes-box">
-          <div class="notes-label">Session Notes</div>
-          ${notes
-            ? `<div class="notes-text">${notes.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
-            : `<div class="no-notes">No notes taken during this session.</div>`
-          }
-        </div>
+        <div class="notes-heading">Session Notes</div>
+        ${notes
+          ? `<div class="notes-text">${notes.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
+          : `<div class="no-notes">No notes taken during this session.</div>`
+        }
       </body>
       </html>
     `
