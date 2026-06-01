@@ -340,6 +340,57 @@ export default function TimerPage() {
 
   const cfg = RESULT[timerState as 'completed' | 'broken' | 'cancelled']
 
+  function exportSessionPdf() {
+    const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    const status = timerState === 'completed' ? 'Completed' : timerState === 'broken' ? 'Broken (focus lost)' : 'Cancelled'
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>FocusFlow — ${topic || 'Session'} Notes</title>
+        <style>
+          body { font-family: system-ui, sans-serif; padding: 48px; color: #1e293b; max-width: 680px; margin: 0 auto; }
+          h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+          .meta { color: #64748b; font-size: 13px; margin-bottom: 32px; }
+          .meta span { margin-right: 16px; }
+          .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600;
+            background: ${timerState === 'completed' ? '#d1fae5' : '#fee2e2'};
+            color: ${timerState === 'completed' ? '#065f46' : '#991b1b'}; }
+          .notes-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-top: 24px; min-height: 200px; }
+          .notes-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 12px; }
+          .notes-text { font-size: 15px; line-height: 1.7; white-space: pre-wrap; color: #334155; }
+          .no-notes { color: #94a3b8; font-style: italic; }
+          @media print { body { padding: 24px; } }
+        </style>
+      </head>
+      <body>
+        <h1>${topic || 'Focus Session'}</h1>
+        <div class="meta">
+          <span>${date}</span>
+          <span>${selectedDuration} min</span>
+          <span class="badge">${status}</span>
+          ${timerState === 'completed' ? `<span>+${earnedPoints} pts</span>` : ''}
+        </div>
+        <div class="notes-box">
+          <div class="notes-label">Session Notes</div>
+          ${notes
+            ? `<div class="notes-text">${notes.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
+            : `<div class="no-notes">No notes taken during this session.</div>`
+          }
+        </div>
+      </body>
+      </html>
+    `
+
+    const win = window.open('', '_blank')
+    if (!win) return
+    win.document.write(html)
+    win.document.close()
+    win.print()
+  }
+
   return (
     <div className="max-w-sm mx-auto text-center">
       <div className={`border rounded-2xl p-8 mb-6 ${cfg.cardClass}`}>
@@ -352,6 +403,15 @@ export default function TimerPage() {
       </div>
 
       {saving && <p className="text-sm text-slate-400 mb-4">Saving session…</p>}
+
+      {(notes || topic) && (
+        <button
+          onClick={exportSessionPdf}
+          className="w-full py-3 mb-3 text-indigo-600 font-semibold border border-indigo-200 rounded-2xl hover:bg-indigo-50 transition-colors"
+        >
+          Export Notes as PDF
+        </button>
+      )}
 
       <button
         onClick={reset}
