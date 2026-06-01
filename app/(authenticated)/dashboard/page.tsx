@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getLevel, formatDate } from '@/lib/utils'
-import ExportPdfButton from './ExportPdfButton'
 
 type Session = {
   id: string
@@ -33,10 +32,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-        <ExportPdfButton sessions={sessions} totalPoints={totalPoints} level={level.label} />
-      </div>
+      <h1 className="text-3xl font-bold text-slate-900 mb-6">Dashboard</h1>
 
       {/* Level card */}
       <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-6 flex items-center justify-between">
