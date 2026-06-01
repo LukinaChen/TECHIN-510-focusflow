@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getLevel, formatDate } from '@/lib/utils'
+import ExportPdfButton from './ExportPdfButton'
 
 type Session = {
   id: string
@@ -9,13 +10,13 @@ type Session = {
   completed: boolean
   reward_earned: number
   created_at: string
+  topic: string | null
+  notes: string | null
 }
 
 export default async function DashboardPage() {
   const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
 
@@ -32,7 +33,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-slate-900 mb-6">Dashboard</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+        <ExportPdfButton sessions={sessions} totalPoints={totalPoints} level={level.label} />
+      </div>
 
       {/* Level card */}
       <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-6 flex items-center justify-between">
@@ -50,21 +54,15 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-sm">
           <div className="text-3xl font-bold text-indigo-600">{totalPoints}</div>
-          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mt-1">
-            Total Points
-          </div>
+          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mt-1">Total Points</div>
         </div>
         <div className="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-sm">
           <div className="text-3xl font-bold text-emerald-600">{completedCount}</div>
-          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mt-1">
-            Completed
-          </div>
+          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mt-1">Completed</div>
         </div>
         <div className="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-sm">
           <div className="text-3xl font-bold text-slate-700">{sessions.length}</div>
-          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mt-1">
-            Total Sessions
-          </div>
+          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mt-1">Total Sessions</div>
         </div>
       </div>
 
@@ -77,41 +75,34 @@ export default async function DashboardPage() {
         {sessions.length === 0 ? (
           <div className="px-6 py-14 text-center">
             <p className="text-slate-400 text-sm">No sessions yet.</p>
-            <p className="text-slate-400 text-sm mt-1">
-              Start a focus session to see your history here.
-            </p>
+            <p className="text-slate-400 text-sm mt-1">Start a focus session to see your history here.</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
             {sessions.map((session) => (
-              <div
-                key={session.id}
-                className="px-6 py-4 flex items-center justify-between"
-              >
-                <div>
-                  <span className="font-medium text-slate-800">
-                    {session.duration_minutes} min
-                  </span>
-                  <span className="text-slate-400 text-sm ml-3">
-                    {formatDate(session.created_at)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                      session.completed
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-red-100 text-red-600'
-                    }`}
-                  >
-                    {session.completed ? 'Completed' : 'Incomplete'}
-                  </span>
-                  {session.reward_earned > 0 && (
-                    <span className="text-sm font-bold text-indigo-600">
-                      +{session.reward_earned}
+              <div key={session.id} className="px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    {session.topic && (
+                      <p className="text-xs font-medium text-indigo-500 mb-0.5">{session.topic}</p>
+                    )}
+                    <span className="font-medium text-slate-800">{session.duration_minutes} min</span>
+                    <span className="text-slate-400 text-sm ml-3">{formatDate(session.created_at)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                      session.completed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'
+                    }`}>
+                      {session.completed ? 'Completed ✅' : 'Incomplete ❌'}
                     </span>
-                  )}
+                    {session.reward_earned > 0 && (
+                      <span className="text-sm font-bold text-indigo-600">+{session.reward_earned}</span>
+                    )}
+                  </div>
                 </div>
+                {session.notes && (
+                  <p className="text-xs text-slate-400 mt-2 leading-relaxed line-clamp-2">{session.notes}</p>
+                )}
               </div>
             ))}
           </div>

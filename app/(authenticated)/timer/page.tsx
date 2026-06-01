@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { calcReward } from '@/lib/utils'
 
 const ENCOURAGEMENTS = [
   "Amazing focus! You're building a great habit. 🧠",
@@ -32,22 +33,26 @@ export default function TimerPage() {
   const [focusLossCount, setFocusLossCount] = useState(0)
   const [showWarning, setShowWarning] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [topic, setTopic] = useState('')
+  const [notes, setNotes] = useState('')
+  const [earnedPoints, setEarnedPoints] = useState(0)
   const [encouragement] = useState(
     () => ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)]
   )
 
-  // Refs for values needed in event handlers / async callbacks (avoid stale closures)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startedAtRef = useRef<Date | null>(null)
   const selectedDurationRef = useRef(25)
   const timerStateRef = useRef<TimerState>('idle')
   const focusLossCountRef = useRef(0)
   const focusDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const completionGuardRef = useRef(false) // prevents double-fire in StrictMode
+  const completionGuardRef = useRef(false)
+  const topicRef = useRef('')
+  const notesRef = useRef('')
 
-  useEffect(() => {
-    selectedDurationRef.current = selectedDuration
-  }, [selectedDuration])
+  useEffect(() => { selectedDurationRef.current = selectedDuration }, [selectedDuration])
+  useEffect(() => { topicRef.current = topic }, [topic])
+  useEffect(() => { notesRef.current = notes }, [notes])
 
   const stopInterval = useCallback(() => {
     if (intervalRef.current) {
@@ -58,11 +63,11 @@ export default function TimerPage() {
 
   const saveSession = useCallback(async (completed: boolean) => {
     setSaving(true)
+    const points = completed ? calcReward(selectedDurationRef.current) : 0
+    setEarnedPoints(points)
     try {
       const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
       if (!user || !startedAtRef.current) return
 
       await supabase.from('sessions').insert({
@@ -70,7 +75,9 @@ export default function TimerPage() {
         duration_minutes: selectedDurationRef.current,
         started_at: startedAtRef.current.toISOString(),
         completed,
-        reward_earned: completed ? 10 : 0,
+        reward_earned: points,
+        topic: topicRef.current || null,
+        notes: notesRef.current || null,
       })
     } catch (err) {
       console.error('Failed to save session:', err)
@@ -79,15 +86,8 @@ export default function TimerPage() {
     }
   }, [])
 
-  // Watch for countdown reaching 0 while running
   useEffect(() => {
-    if (
-      timerState !== 'running' ||
-      secondsLeft !== 0 ||
-      !startedAtRef.current ||
-      completionGuardRef.current
-    )
-      return
+    if (timerState !== 'running' || secondsLeft !== 0 || !startedAtRef.current || completionGuardRef.current) return
     completionGuardRef.current = true
     stopInterval()
     timerStateRef.current = 'completed'
@@ -103,34 +103,23 @@ export default function TimerPage() {
     saveSession(false)
   }, [stopInterval, saveSession])
 
-  // Focus detection — fires on visibilitychange (hidden) and window blur
   const handleFocusLoss = useCallback(() => {
     if (timerStateRef.current !== 'running') return
-    // Debounce: visibilitychange and blur can both fire for a single tab switch
     if (focusDebounceRef.current) return
-    focusDebounceRef.current = setTimeout(() => {
-      focusDebounceRef.current = null
-    }, 500)
+    focusDebounceRef.current = setTimeout(() => { focusDebounceRef.current = null }, 500)
 
     const newCount = focusLossCountRef.current + 1
     focusLossCountRef.current = newCount
     setFocusLossCount(newCount)
 
-    if (newCount === 1) {
-      setShowWarning(true)
-    } else {
-      handleBroken()
-    }
+    if (newCount === 1) setShowWarning(true)
+    else handleBroken()
   }, [handleBroken])
 
   useEffect(() => {
     if (timerState !== 'running') return
-
-    const onVisibilityChange = () => {
-      if (document.hidden) handleFocusLoss()
-    }
+    const onVisibilityChange = () => { if (document.hidden) handleFocusLoss() }
     const onBlur = () => handleFocusLoss()
-
     document.addEventListener('visibilitychange', onVisibilityChange)
     window.addEventListener('blur', onBlur)
     return () => {
@@ -149,7 +138,6 @@ export default function TimerPage() {
     setShowWarning(false)
     setSecondsLeft(seconds)
     setTimerState('running')
-
     intervalRef.current = setInterval(() => {
       setSecondsLeft((prev) => Math.max(0, prev - 1))
     }, 1000)
@@ -173,6 +161,8 @@ export default function TimerPage() {
     setSecondsLeft(0)
     setFocusLossCount(0)
     setShowWarning(false)
+    setNotes('')
+    setEarnedPoints(0)
   }
 
   function handleDurationSelect(mins: number) {
@@ -183,9 +173,7 @@ export default function TimerPage() {
   function handleCustomInput(value: string) {
     setCustomInput(value)
     const num = parseInt(value)
-    if (!isNaN(num) && num >= 1 && num <= 120) {
-      setSelectedDuration(num)
-    }
+    if (!isNaN(num) && num >= 1 && num <= 120) setSelectedDuration(num)
   }
 
   // ─── Idle ────────────────────────────────────────────────────────────────
@@ -198,6 +186,17 @@ export default function TimerPage() {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+            Class / Topic
+          </p>
+          <input
+            type="text"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="e.g. TECHIN 510 — Week 9 lecture"
+            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-5"
+          />
+
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
             Presets
           </p>
@@ -230,8 +229,12 @@ export default function TimerPage() {
             value={customInput}
             onChange={(e) => handleCustomInput(e.target.value)}
             placeholder="Enter minutes…"
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6"
+            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4"
           />
+
+          <p className="text-xs text-slate-400 text-center mb-4">
+            {selectedDuration < 10 ? '5 pts' : selectedDuration < 30 ? '10 pts' : '20 pts'} on completion
+          </p>
 
           <button
             onClick={startTimer}
@@ -253,51 +256,43 @@ export default function TimerPage() {
 
     return (
       <div className="max-w-sm mx-auto text-center">
-        {/* Focus status badge */}
-        <div
-          className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-8 ${
-            focused
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-amber-100 text-amber-700'
-          }`}
-        >
-          <span
-            className={`w-2 h-2 rounded-full ${
-              focused ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
-            }`}
-          />
+        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-6 ${
+          focused ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+        }`}>
+          <span className={`w-2 h-2 rounded-full ${focused ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
           {focused ? 'Active' : 'Focus Lost!'}
         </div>
 
-        {/* Warning toast */}
         {showWarning && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 flex items-center justify-between text-left">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 flex items-center justify-between text-left">
             <p className="text-amber-800 text-sm font-medium">
               ⚠️ Focus lost — one more will break your session
             </p>
-            <button
-              onClick={() => setShowWarning(false)}
-              className="ml-3 text-amber-500 hover:text-amber-700 text-lg leading-none"
-              aria-label="Dismiss"
-            >
-              ✕
-            </button>
+            <button onClick={() => setShowWarning(false)} className="ml-3 text-amber-500 hover:text-amber-700 text-lg leading-none" aria-label="Dismiss">✕</button>
           </div>
         )}
 
-        {/* Timer display */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm mb-6">
+        <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm mb-4">
+          {topic && <p className="text-xs font-medium text-indigo-400 mb-2">{topic}</p>}
           <div className="text-7xl font-mono font-bold text-slate-900 tracking-tight tabular-nums">
             {formatTime(secondsLeft)}
           </div>
           <p className="text-slate-400 mt-3 text-sm">{selectedDuration} minute session</p>
         </div>
 
-        {/* Progress bar */}
-        <div className="w-full bg-slate-200 rounded-full h-1.5 mb-8">
-          <div
-            className="bg-indigo-600 h-1.5 rounded-full transition-all duration-1000 ease-linear"
-            style={{ width: `${progress}%` }}
+        <div className="w-full bg-slate-200 rounded-full h-1.5 mb-6">
+          <div className="bg-indigo-600 h-1.5 rounded-full transition-all duration-1000 ease-linear" style={{ width: `${progress}%` }} />
+        </div>
+
+        {/* Notes box */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-6 text-left">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Session Notes</p>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Jot down key points from class…"
+            rows={4}
+            className="w-full text-sm text-slate-700 placeholder-slate-300 resize-none focus:outline-none"
           />
         </div>
 
@@ -318,7 +313,7 @@ export default function TimerPage() {
       icon: '🎉',
       title: 'Session Complete!',
       message: encouragement,
-      sub: `+10 points · ${selectedDuration} min session`,
+      sub: `+${earnedPoints} points · ${selectedDuration} min session`,
       cardClass: 'bg-emerald-50 border-emerald-200',
       titleClass: 'text-emerald-800',
       badgeClass: 'bg-emerald-100 text-emerald-700',
@@ -356,9 +351,7 @@ export default function TimerPage() {
         </span>
       </div>
 
-      {saving && (
-        <p className="text-sm text-slate-400 mb-4">Saving session…</p>
-      )}
+      {saving && <p className="text-sm text-slate-400 mb-4">Saving session…</p>}
 
       <button
         onClick={reset}
