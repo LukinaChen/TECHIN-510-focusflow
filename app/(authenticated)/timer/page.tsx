@@ -404,14 +404,12 @@ export default function TimerPage() {
 
       {saving && <p className="text-sm text-slate-400 mb-4">Saving session…</p>}
 
-      {(notes || topic) && (
-        <button
-          onClick={exportSessionPdf}
-          className="w-full py-3 mb-3 text-indigo-600 font-semibold border border-indigo-200 rounded-2xl hover:bg-indigo-50 transition-colors"
-        >
-          Export Notes as PDF
-        </button>
-      )}
+      <button
+        onClick={exportSessionPdf}
+        className="w-full py-3 mb-3 text-indigo-600 font-semibold border border-indigo-200 rounded-2xl hover:bg-indigo-50 transition-colors"
+      >
+        Export Notes as PDF
+      </button>
 
       <button
         onClick={reset}
