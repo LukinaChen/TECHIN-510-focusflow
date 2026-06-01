@@ -358,7 +358,7 @@ export default function TimerPage() {
           .meta { font-family: system-ui, sans-serif; font-size: 13px; color: #64748b; display: flex; gap: 20px; align-items: center; margin-bottom: 36px; }
           .status { font-weight: 600; color: ${timerState === 'completed' ? '#16a34a' : '#dc2626'}; }
           .notes-heading { font-family: system-ui, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 14px; }
-          .notes-text { font-size: 15px; line-height: 1.85; white-space: pre-wrap; color: #334155; }
+          .notes-text { font-size: 15px; line-height: 1.85; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; color: #334155; }
           .no-notes { font-size: 14px; color: #94a3b8; font-style: italic; }
           @media print { body { padding: 40px 48px; } }
         </style>
