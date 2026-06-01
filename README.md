@@ -24,7 +24,9 @@ Students frequently get distracted by their phones or laptops during class — s
 
 - **Timed focus sessions** — Choose a duration and start a countdown
 - **Stay-on-page detection** — The app detects if you tab away or switch windows
-- **Reward on completion** — Finish a session cleanly and earn points
+- **Dynamic rewards** — Earn points based on session length: 5 pts (<10 min), 10 pts (10–29 min), 20 pts (30+ min)
+- **Class notes** — Jot down notes during a session, labeled by class or topic, saved with each session
+- **Export notes as PDF** — Download your session notes as a formatted PDF at the end of every session
 - **Session history** — Review past sessions and track your focus habits
 
 ---
